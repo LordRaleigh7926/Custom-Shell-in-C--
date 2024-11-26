@@ -58,6 +58,8 @@ int main() {
       string text = input.substr(ECHO_LEN);
       cout << text << endl;
 
+    } else if (input == "") {
+      continue;
     } else {
 
       cout<<input<<": command not found\n";
