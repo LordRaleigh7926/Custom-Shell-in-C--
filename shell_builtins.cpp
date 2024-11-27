@@ -1,5 +1,5 @@
 // shell_builtins.cpp
-#include "shell_builtins.h"  // Include the header file for declarations
+#include "shell_builtins.h"  // Including the header file for declarations
 
 using namespace std;
 
@@ -11,6 +11,7 @@ static struct UnitBufSetter
         cout << unitbuf;
         cerr << unitbuf;
     }
+    
 } unitBufSetter; // This will run when the program starts
 
 // Function to split a string into words based on spaces
@@ -31,6 +32,19 @@ vector<string> splitString(const string &str)
 // Function to check if an item exists in an array
 bool isInArray(string* arr, int size, string target) {
     return find(arr, arr + size, target) != arr + size;
+}
+
+string get_path(string command){
+    string path_env = getenv("PATH");
+    stringstream pathStream(path_env);
+    string path;
+    while (getline(pathStream, path, ':')) {
+        string abs_path = path + '/' + command;
+        if (filesystem::exists(abs_path)) {
+            return abs_path;
+        }
+    }
+    return "";  
 }
 
 // Method to handle the 'echo' command
@@ -64,9 +78,29 @@ void BuiltinCommands::typeCommand(const string &input)
     for (const auto &command : commands)
     {
         if (isInArray(CommandsBuiltin, 3, command)) {
-            cout << command << " is a shell builtin\n";
+            cout << command << " is a shell builtin"<<endl;
+        } else if (get_path(command)!="") {
+            cout<<command<< " is "<<get_path(command)<<endl;
         } else {
-            cout << command << ": not found\n";
+            cout << command << ": not found"<<endl;
         }
+    }
+}
+
+
+void BuiltinCommands::changeDirectory(const string &input) {
+
+    int exec_code = chdir(input.c_str());
+    if (exec_code == -1) {  // chdir returns -1 on failure
+        cerr << "cd: " << input << ": " << strerror(errno) << endl;
+    }
+    
+}
+
+void BuiltinCommands::printWorkingDirectory(const string &input) {
+    try {
+        cout << filesystem::current_path() << std::endl;  // Print the current working directory
+    } catch (const std::exception &e) {
+        std::cerr << "pwd: Error retrieving current directory: " << e.what() << std::endl;
     }
 }

@@ -2,6 +2,7 @@
 #include <string>
 #include <functional>
 #include <utility>
+#include <filesystem>
 
 #include "shell_builtins.h"
 
@@ -49,9 +50,12 @@ int main() {
 
   BuiltinCommands builtIns = BuiltinCommands();
 
-  unordered_map<string, std::function<void(string)>> functionMap =  {
+  unordered_map<string, function<void(string)>> functionMap =  {
     {"echo", [&](string input) { builtIns.echo(input); }},
-    {"type", [&](string input) { builtIns.typeCommand(input); }}
+    {"type", [&](string input) { builtIns.typeCommand(input); }},
+    {"cd", [&](string input) { builtIns.changeDirectory(input); }},
+    {"pwd", [&](string input) { builtIns.printWorkingDirectory(input); }}
+    
   };
 
   while (true) {
@@ -73,7 +77,12 @@ int main() {
     }
     catch(const std::exception& e)
     {
-      cerr<<input<<": command not found\n";
+      if (get_path(command)=="") {
+        cerr<<input<<": command not found\n";
+        continue;
+      } else {
+        int exec_code = system(input.c_str());
+      }
     }
 
   }
