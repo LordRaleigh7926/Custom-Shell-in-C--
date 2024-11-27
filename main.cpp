@@ -1,5 +1,9 @@
 #include <iostream>
 #include <string>
+#include <functional>
+#include <utility>
+
+#include "shell_builtins.h"
 
 using namespace std;
 using std::unitbuf;
@@ -30,41 +34,47 @@ void removeSpaces(string& str) {
     }
 }
 
+pair<string, string> getCommandAndARGs(const string& str) {
+    size_t spacePos = str.find(' ');
+    if (spacePos == string::npos) {
+        return make_pair(str, "None"); // No spaces, return the whole string
+    }
+    return make_pair(str.substr(0, spacePos), str.substr(spacePos+1));
+}
+
 int main() {
   // Flush after every std::cout / std:cerr
   cout << unitbuf;
   cerr << unitbuf;
 
+  BuiltinCommands builtIns = BuiltinCommands();
 
-  // Array of all the builtin commands
-  string builtinCommands[] = {"echo", "exit", "type"};
-
-
+  unordered_map<string, std::function<void(string)>> functionMap =  {
+    {"echo", [&](string input) { builtIns.echo(input); }},
+    {"type", [&](string input) { builtIns.typeCommand(input); }}
+  };
 
   while (true) {
 
     string input = getInput();
     removeSpaces(input);
+    auto [command, args] = getCommandAndARGs(input);
 
-    if (input == "exit 0" || input == "exit") {
-      return 0;
-
-    } else if (input == "exit 1") {
-      return 1;
-
-    } else if (input.find("echo ") == 0) {
-
-      const int ECHO_LEN = 5; // Including space
-      string text = input.substr(ECHO_LEN);
-      cout << text << endl;
-
+    int exit_code = builtIns.exitCommand(input);
+    if (exit_code != 3) {
+      return exit_code;
     } else if (input == "") {
       continue;
-    } else {
-
-      cout<<input<<": command not found\n";
     }
 
+    try
+    {
+      functionMap[command](args);
+    }
+    catch(const std::exception& e)
+    {
+      cerr<<input<<": command not found\n";
+    }
 
   }
 }

@@ -1,3 +1,6 @@
+# Outdated Readme
+
+
 # Command-Line Shell Simulation
 
 This project simulates a simple command-line shell that reads user input, processes basic commands, and outputs results to the terminal. The shell supports a few built-in commands and handles basic input parsing, with functionality for `echo`, `exit`, and an error message for unrecognized commands.
