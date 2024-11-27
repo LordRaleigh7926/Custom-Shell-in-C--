@@ -3,17 +3,34 @@
 #include <functional>
 #include <utility>
 #include <filesystem>
+#include <fstream>
 
 #include "shell_builtins.h"
 
 using namespace std;
 using std::unitbuf;
 
+// Variables
+
+const string HISTORY_FILE = "history.txt";
+
+
+
 string getInput() {
 
   cout << "$ ";
   string input;
   getline(std::cin, input);
+
+  // Adding the input to history
+  if (!input.empty()) {
+      ofstream historyFile(HISTORY_FILE, ios::app); // Open in append mode
+      if (historyFile.is_open()) {
+          historyFile << input << endl;
+      } else {
+          cerr << "Error: Unable to open history file!" << endl;
+      }
+  }
 
   return input;
 }
@@ -54,8 +71,8 @@ int main() {
     {"echo", [&](string input) { builtIns.echo(input); }},
     {"type", [&](string input) { builtIns.typeCommand(input); }},
     {"cd", [&](string input) { builtIns.changeDirectory(input); }},
-    {"pwd", [&](string input) { builtIns.printWorkingDirectory(input); }}
-    
+    {"pwd", [&](string input) { builtIns.printWorkingDirectory(input); }},
+    {"history", [&](string input) { builtIns.printHistory(HISTORY_FILE); }}
   };
 
   while (true) {

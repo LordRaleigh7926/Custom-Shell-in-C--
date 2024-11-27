@@ -1,0 +1,6 @@
+help
+hello
+echo deadpool
+type killmonger sudo
+history
+exit

@@ -10,6 +10,7 @@
 #include <filesystem>
 #include <unistd.h>  // For chdir()
 #include <cstring>     // For strerror()
+#include <fstream>
 
 using namespace std;
 
@@ -38,6 +39,8 @@ public:
     static void changeDirectory(const string &input);
 
     static void printWorkingDirectory(const string &input);
+
+    static void printHistory(const string &input);
 
 };
 

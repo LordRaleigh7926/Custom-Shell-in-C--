@@ -104,3 +104,18 @@ void BuiltinCommands::printWorkingDirectory(const string &input) {
         std::cerr << "pwd: Error retrieving current directory: " << e.what() << std::endl;
     }
 }
+
+void BuiltinCommands::printHistory(const string &HISTORY_FILE) {
+    ifstream historyFile(HISTORY_FILE); // Open the file for reading
+    if (!historyFile.is_open()) {
+        cerr << "Error: Unable to open history file!" << endl;
+        return;
+    }
+
+    string line;
+    int lineNumber = 1;
+    while (getline(historyFile, line)) {
+        cout << lineNumber++ << " " << line << endl;
+    }
+    historyFile.close();
+}
